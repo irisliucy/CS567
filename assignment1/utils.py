@@ -15,8 +15,26 @@ def f1_score(real_labels, predicted_labels):
     :return: float
     """
     assert len(real_labels) == len(predicted_labels)
-    raise NotImplementedError
+    
+    tp, tn, fp, fn = 0, 0, 0, 0
+    for real_label, predicted_label in zip(real_labels, predicted_labels):
+        if real_label == 1 and predicted_label == 1:
+            tp += 1
+        elif real_label == 0 and predicted_label == 1:
+            fp += 1
+        elif real_label == 1 and predicted_label == 0:
+            fn += 1
+        else:
+            tn += 1 
+        
+    precision = 0 if tp + fp == 0 else tp / (tp + fp)
+    recall = 0 if tp + fn == 0 else tp / (tp + fn)
 
+    if precision + recall == 0:
+        return 0
+    else:
+        # f1 = 2 * (precision * recall) / (precision + recall)
+        return 2.0 * (precision * recall) / (precision + recall)
 
 class Distances:
     @staticmethod
@@ -27,7 +45,12 @@ class Distances:
         :param point2: List[float]
         :return: float
         """
-        raise NotImplementedError
+        x = np.array(point1)
+        y = np.array(point2)
+
+        # np.fabs computes absolute values element-wise
+        dist = np.nansum(np.fabs(x - y) / (np.fabs(x) + np.fabs(y))) 
+        return dist
 
     @staticmethod
     # TODO
@@ -41,7 +64,12 @@ class Distances:
         :param point2: List[float]
         :return: float
         """
-        raise NotImplementedError
+        x = np.asarray(point1)
+        y = np.asarray(point2)
+
+        p = 3
+        dist = np.power(np.sum(np.power(np.fabs(x - y), p)), 1. / p)
+        return dist
 
     @staticmethod
     # TODO
@@ -51,7 +79,11 @@ class Distances:
         :param point2: List[float]
         :return: float
         """
-        raise NotImplementedError
+        x = np.asarray(point1)
+        y = np.asarray(point2)
+
+        dist = np.sqrt(np.sum(np.dot((x - y), (x - y))))
+        return dist
 
     @staticmethod
     # TODO
@@ -61,7 +93,11 @@ class Distances:
         :param point2: List[float]
         :return: float
         """
-        raise NotImplementedError
+        x = np.asarray(point1)
+        y = np.asarray(point2)
+
+        dist = np.inner(x, y)
+        return dist
 
     @staticmethod
     # TODO
@@ -71,7 +107,11 @@ class Distances:
        :param point2: List[float]
        :return: float
        """
-        raise NotImplementedError
+        x = np.asarray(point1)
+        y = np.asarray(point2)
+
+        dist = 1.0 - (np.dot(x, y) / (np.linalg.norm(x)*np.linalg.norm(y))) if (np.linalg.norm(x) * np.linalg.norm(y)) != 0 else 0
+        return dist
 
     @staticmethod
     # TODO
@@ -81,7 +121,15 @@ class Distances:
        :param point2: List[float]
        :return: float
        """
-        raise NotImplementedError
+        x = np.asarray(point1)
+        y = np.asarray(point2)
+
+        sub = np.subtract(x,y)
+        return -np.exp(-1/2*np.inner(sub,sub))
+
+
+        # dist = -np.exp(-1./2*(np.inner(x - y, x-y)))
+        # return dist
 
 
 class HyperparameterTuner:
@@ -117,11 +165,49 @@ class HyperparameterTuner:
         """
         
         # You need to assign the final values to these variables
-        self.best_k = None
-        self.best_distance_function = None
+        self.best_k = 0                    
+        self.best_distance_function = None # string
         self.best_model = None
-        raise NotImplementedError
+         
+        k_values = range(1, 30, 2)
+        score = 0
+        best_score = -1
+        i = 0
+        distance_metric = list(distance_funcs.keys())
+        best_metrics = {}
 
+        for k in k_values:
+            for dist_func_name, dist_func in distance_funcs.items():
+                score = 0
+
+                # train the model and compute f1 score
+                model = KNN(k, dist_func)
+                model.train(x_train, y_train)
+                predicted_labels = model.predict(x_val)
+                score = f1_score(y_val, predicted_labels)
+
+                dist_func_index = distance_metric.index(dist_func_name)
+
+                if score >= best_score:
+                    best_score = score
+                    best_metrics[i] = ({
+                            'score': score,
+                            'distance_fn': dist_func_index,
+                            'k': k
+                            })
+
+                i += 1
+
+        # get sorted knn result based on score, distance metrics and k 
+        best_metrics = {k: v for k, v in sorted(best_metrics.items(), key=lambda item: (-item[1]['score'], item[1]['distance_fn'], item[1]['k']))}
+        best_metrics = list(best_metrics.values())[0]  # take the first one as the best metrics 
+        self.best_k = best_metrics['k']
+        self.best_distance_function = distance_metric[best_metrics['distance_fn']]
+        
+        best_distance_fn = distance_funcs[self.best_distance_function]
+        self.best_model = KNN(self.best_k, best_distance_fn)
+        self.best_model.train(x_train, y_train)
+                    
     # TODO: find parameters with the best f1 score on validation dataset, with normalized data
     def tuning_with_scaling(self, distance_funcs, scaling_classes, x_train, y_train, x_val, y_val):
         """
@@ -152,12 +238,57 @@ class HyperparameterTuner:
         """
         
         # You need to assign the final values to these variables
-        self.best_k = None
+        self.best_k = 0
         self.best_distance_function = None
         self.best_scaler = None
         self.best_model = None
-        raise NotImplementedError
+        
+        k_values = range(1, 30, 2)
+        score = 0
+        best_score = -1
+        i = 0
+        best_metrics = {}
+        distance_metric = list(distance_funcs.keys())
+        scalar_mtd = list(scaling_classes.keys())
 
+        for scaling_name, scaling_class in scaling_classes.items(): 
+            # transform train and val data
+            scaling_func = scaling_class()
+            x_train_scaled = scaling_func(x_train)
+            x_val_scaled = scaling_func(x_val)
+
+            for k in k_values:
+                for dist_func_name, dist_func in distance_funcs.items():
+
+                    # train the model with transformed data
+                    model = KNN(k, dist_func)
+                    model.train(x_train_scaled, y_train)
+                    predicted_labels = model.predict(x_val_scaled)
+                    score = f1_score(y_val, predicted_labels)
+
+                    dist_func_index = distance_metric.index(dist_func_name)
+                    scalar_index = scalar_mtd.index(scaling_name)
+
+                    if score >= best_score:
+                        best_score = score
+                        best_metrics[i] = ({
+                                'score': score,
+                                'distance_fn': dist_func_index,
+                                'scalar': scalar_index,
+                                'k': k
+                                })
+                    i += 1
+
+        best_metrics = {k: v for k, v in sorted(best_metrics.items(), key=lambda item: (-item[1]['score'], item[1]['scalar'], item[1]['distance_fn'], item[1]['k']))}
+        best_metrics = list(best_metrics.values())[0] # take the first one as the best metrics 
+        self.best_k = best_metrics['k']
+        self.best_scaler = scalar_mtd[best_metrics['scalar']]
+        self.best_distance_function = distance_metric[best_metrics['distance_fn']]
+        
+        best_distance_fn = distance_funcs[self.best_distance_function]
+        best_scalar = scaling_classes[self.best_scaler]()
+        self.best_model = KNN(self.best_k, best_distance_fn)
+        self.best_model.train(best_scalar(x_train), y_train)
 
 class NormalizationScaler:
     def __init__(self):
@@ -175,8 +306,17 @@ class NormalizationScaler:
         :param features: List[List[float]]
         :return: List[List[float]]
         """
-        raise NotImplementedError
-
+        norms = []
+        for i in range(len(features)):
+            norm = []
+            scaling_w = np.sqrt(np.inner(features[i], features[i]))
+            for j in range(len(features[i])):
+                if scaling_w != 0:
+                    norm.append(features[i][j]/scaling_w)
+                else:
+                    norm.append(0)
+            norms.append(norm)
+        return norms
 
 class MinMaxScaler:
     """
@@ -213,7 +353,9 @@ class MinMaxScaler:
     """
 
     def __init__(self):
-        pass
+        self.initialized = False
+        self.data_max = []
+        self.data_min = []
 
     def __call__(self, features):
         """
@@ -224,4 +366,19 @@ class MinMaxScaler:
         :param features: List[List[float]]
         :return: List[List[float]]
         """
-        raise NotImplementedError
+        if not self.initialized:
+            self.initialized = True
+            data = np.reshape(features, (len(features),len(features[0])))
+            self.data_max.extend(np.amax(data, axis=0))
+            self.data_min.extend(np.amin(data, axis=0))
+        
+        # scale according to max and min of each column
+        minimax = features.copy()
+        for j in range(len(features[0])):
+            for i in range(len(features)):
+                denom = self.data_max[j] - self.data_min[j]
+                if denom != 0:
+                    minimax[i][j] = (minimax[i][j] - self.data_min[j])/denom
+                else:
+                    minimax[i][j] = 0.0     
+        return minimax

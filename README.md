@@ -4,11 +4,11 @@ My solutions to assignments of USC CS567 course for 2020 Summer.
 
 ### Assignment 1:
 
-- [Q1]: F-1 score and Distance functions: 30 points
-- [Q2]: MinMaxScaler and NormalizationScaler (20 points- 10 each)
-- [Q3]: Find best parameters before scaling - 20 points
-- [Q4]: Find best parameters after scaling - 20 points
-- [Q5]: Perform classification of the data - 10 points
+- [Q1]: F-1 score and Distance functions *(Done)*
+- [Q2]: MinMaxScaler and NormalizationScaler *(Done)*
+- [Q3]: Find best parameters before scaling *(Done)*
+- [Q4]: Find best parameters after scaling *(Done)*
+- [Q5]: Perform classification of the data *(Done)*
 
 ### Assignment 2:
 
