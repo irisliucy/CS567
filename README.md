@@ -2,26 +2,29 @@
 
 My solutions to assignments of USC CS567 course for 2020 Summer.
 
-### Assignment 1:
+## Assignment 1
 
-- [Q1]: F-1 score and Distance functions *(Done)*
-- [Q2]: MinMaxScaler and NormalizationScaler *(Done)*
-- [Q3]: Find best parameters before scaling *(Done)*
-- [Q4]: Find best parameters after scaling *(Done)*
-- [Q5]: Perform classification of the data *(Done)*
+[KNN from scratch](https://github.com/irisliucy/CS567/blob/master/assignment1/knn.py) on heart disease dataset.
 
-### Assignment 2:
+- [[1](https://github.com/irisliucy/CS567/blob/master/assignment1/utils.py)]: F-1 score and Distance functions *(Done)*
+- [[2](https://github.com/irisliucy/CS567/blob/master/assignment1/utils.py)]: MinMaxScaler and NormalizationScaler *(Done)*
+- [[3](https://github.com/irisliucy/CS567/blob/master/assignment1/utils.py)]: Find best parameters before scaling *(Done)*
+- [[4](https://github.com/irisliucy/CS567/blob/master/assignment1/utils.py)]: Find best parameters after scaling *(Done)*
+- [[5](https://github.com/irisliucy/CS567/blob/master/assignment1/utils.py)]: Perform classification of the data *(Done)*
 
-- [Q1]
-- [Q2]
-- [Q3]
-- [Q4]
-- [Q5]
+## Assignment 2
 
-#### Assignment 3:
+[Neural Network from scratch](https://github.com/irisliucy/CS567/blob/master/assignment2/neural_networks.py) on MNIST dataset.
 
-- [Q1]
-- [Q2]
-- [Q3]
-- [Q4]
-- [Q5]
+- [[1](https://github.com/irisliucy/CS567/blob/master/assignment2/neural_networks.py)]: Linear Layer *(Done)*
+- [[2](https://github.com/irisliucy/CS567/blob/master/assignment2/neural_networks.py)]: Activation Function-Tanh *(Done)*
+- [[3](https://github.com/irisliucy/CS567/blob/master/assignment2/neural_networks.py)]: Activation Function-ReLU *(Done)*
+- [[4](https://github.com/irisliucy/CS567/blob/master/assignment2/neural_networks.py)]: Dropout *(Done)*
+
+## Assignment 3
+
+- [1]
+- [2]
+- [3]
+- [4]
+- [5]
