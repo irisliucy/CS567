@@ -23,8 +23,9 @@ My solutions to assignments of USC CS567 course for 2020 Summer.
 
 ## Assignment 3
 
-- [1]
-- [2]
-- [3]
-- [4]
-- [5]
+[HMM for Part-of-Speech Tagging & Gene-Tagging problem](https://github.com/irisliucy/CS567/blob/master/assignment3/hmm.py)
+
+- [[1](https://github.com/irisliucy/CS567/blob/master/assignment3/hmm.py)] HMM Model 
+- [[2](https://github.com/irisliucy/CS567/blob/master/assignment3/hmm.py)] Viterbi Algorithm
+- [[3](https://github.com/irisliucy/CS567/blob/master/assignment3/tagger.py)] Application to Speech Tagging
+- [[4](https://github.com/irisliucy/CS567/blob/master/assignment3/tagger.py)] Application to Gene Tagging
